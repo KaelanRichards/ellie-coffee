@@ -1,13 +1,14 @@
-/**
- * This file contains the root router of your tRPC-backend
- */
-import { createCallerFactory, publicProcedure, router } from '../trpc';
-import { postRouter } from './post';
+import { createCallerFactory, router } from '../trpc';
+import { roastLogRouter } from './roastLogRouter';
+import { roastProfileRouter } from './roastProfileRouter';
+import { greenBeanRouter } from './greenBeanRouter';
+import { cuppingNoteRouter } from './cuppingNoteRouter';
 
 export const appRouter = router({
-  healthcheck: publicProcedure.query(() => 'yay!'),
-
-  post: postRouter,
+  roastLog: roastLogRouter,
+  roastProfile: roastProfileRouter,
+  greenBean: greenBeanRouter,
+  cuppingNote: cuppingNoteRouter,
 });
 
 export const createCaller = createCallerFactory(appRouter);

@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 datasource db {
   provider = "postgres"
   url      = env("DATABASE_URL")
@@ -10,14 +7,67 @@ generator client {
   provider = "prisma-client-js"
 }
 
-model Post {
-  id    String @id @default(uuid())
-  title String
-  text  String
-
-  // To return `Date`s intact through the API we use transformers
-  // https://trpc.io/docs/v11/data-transformers
-  // This is unique so it can be used for cursor-based pagination
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String?
+  role      String   @default("user")
   createdAt DateTime @default(now())
-  updatedAt DateTime @default(now()) @updatedAt
+  updatedAt DateTime @updatedAt
+  roastLogs RoastLog[]
+  profiles  RoastProfile[]
+}
+
+model RoastLog {
+  id           String   @id @default(uuid())
+  date         DateTime
+  beanType     String
+  profileId    String
+  profile      RoastProfile @relation(fields: [profileId], references: [id])
+  equipment    String
+  notes        String?
+  userId       String
+  user         User     @relation(fields: [userId], references: [id])
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  cuppingNotes CuppingNote[]
+}
+
+model RoastProfile {
+  id        String   @id @default(uuid())
+  name      String
+  data      Json
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  roastLogs RoastLog[]
+}
+
+model GreenBean {
+  id              String   @id @default(uuid())
+  origin          String
+  variety         String
+  processingMethod String
+  quantity        Float
+  purchaseDate    DateTime
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model CuppingNote {
+  id         String   @id @default(uuid())
+  roastLogId String
+  roastLog   RoastLog @relation(fields: [roastLogId], references: [id])
+  aroma      Int
+  flavor     Int
+  aftertaste Int
+  acidity    Int
+  body       Int
+  balance    Int
+  overall    Int
+  notes      String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 }

@@ -40,3 +40,9 @@ yarn-error.log*
 
 # testing
 playwright/test-results
+
+
+# secrets
+.env
+.env.local
+    

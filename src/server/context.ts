@@ -1,17 +1,18 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import type * as trpcNext from '@trpc/server/adapters/next';
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface CreateContextOptions {
-  // session: Session | null
+  session: { userId: string } | null;
 }
 
 /**
  * Inner function for `createContext` where we create the context.
  * This is useful for testing when we don't want to mock Next.js' request/response
  */
-export async function createContextInner(_opts: CreateContextOptions) {
-  return {};
+export async function createContextInner(opts: CreateContextOptions) {
+  return {
+    session: opts.session,
+  };
 }
 
 export type Context = Awaited<ReturnType<typeof createContextInner>>;
@@ -23,7 +24,7 @@ export type Context = Awaited<ReturnType<typeof createContextInner>>;
 export async function createContext(
   opts: trpcNext.CreateNextContextOptions,
 ): Promise<Context> {
-  // for API-response caching see https://trpc.io/docs/v11/caching
-
-  return await createContextInner({});
+  // Here you would normally get the session from a cookie or header
+  const session = { userId: 'mock-user-id' }; // Replace this with actual session retrieval logic
+  return await createContextInner({ session });
 }

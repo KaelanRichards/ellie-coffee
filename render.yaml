@@ -6,7 +6,7 @@
 services:
   - type: web
     name: trpc-starter-app
-    env: node
+    runtime: node
     plan: free
     ## 👇 Specify the plan for the PR deployment:
     # previewPlan: starter
