@@ -1,12 +1,13 @@
 import { trpc } from '~/utils/trpc';
 import Link from 'next/link';
-import { CgCoffee, CgNotes, CgDatabase } from 'react-icons/cg';
+import { CgCoffee, CgDatabase } from 'react-icons/cg';
 import {
   FaCalendarAlt,
   FaLeaf,
-  FaExchangeAlt,
   FaTools,
   FaFlask,
+  FaMugHot,
+  FaCoffee,
 } from 'react-icons/fa';
 import { useState } from 'react';
 
@@ -215,31 +216,35 @@ const LowStockSection: React.FC<LowStockSectionProps> = ({
 );
 
 const QuickActionButtons = () => (
-  <nav className="mt-4 flex flex-wrap justify-center gap-2">
+  <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-8">
     <DashboardButton
       href="/roast-log/new"
-      icon={<CgCoffee />}
-      label="New Roast"
+      icon={<FaCoffee className="text-white" size={20} />}
+      label="New Roast Log"
       primary
     />
     <DashboardButton
-      href="/roast-profile/new"
-      icon={<CgNotes />}
-      label="New Profile"
-    />
-    <DashboardButton
       href="/green-bean/new"
-      icon={<CgDatabase />}
-      label="Add Beans"
+      icon={<FaLeaf className="text-white" size={20} />}
+      label="Add Green Beans"
+      primary
       color="green"
     />
     <DashboardButton
-      href="/roast-comparison"
-      icon={<FaExchangeAlt className="w-5 h-5" />}
-      label="Compare Roasts"
+      href="/cupping-note/new"
+      icon={<FaMugHot className="text-white" size={20} />}
+      label="New Cupping Note"
+      primary
       color="purple"
     />
-  </nav>
+    <DashboardButton
+      href="/batch-planning"
+      icon={<FaCalendarAlt className="text-white" size={20} />}
+      label="Batch Planning"
+      primary
+      color="blue"
+    />
+  </div>
 );
 
 interface DashboardButtonProps {
@@ -247,7 +252,7 @@ interface DashboardButtonProps {
   icon: React.ReactNode;
   label: string;
   primary?: boolean;
-  color?: 'brown' | 'green' | 'purple';
+  color?: 'brown' | 'green' | 'purple' | 'blue';
 }
 
 const DashboardButton: React.FC<DashboardButtonProps> = ({

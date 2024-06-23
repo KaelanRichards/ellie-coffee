@@ -1,6 +1,6 @@
 import { router, publicProcedure } from '../trpc';
-import { prisma } from '~/server/prisma';
 import { z } from 'zod';
+import { prisma } from '~/server/prisma';
 import { Prisma } from '@prisma/client';
 
 const defaultExperimentSelect = {

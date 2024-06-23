@@ -11,6 +11,7 @@ async function main() {
   await seedRoastLogs();
   await seedCuppingNotes();
   await seedExperiments();
+  await seedBatchPlans();
 
   console.log('Seed data created successfully');
 }
@@ -261,6 +262,37 @@ async function seedExperiments() {
       data: { experimentId: experiments[0].id },
     });
   }
+}
+
+async function seedBatchPlans() {
+  const user = await prisma.user.findUnique({
+    where: { email: 'user@example.com' },
+  });
+  if (!user) throw new Error('User not found');
+
+  const roastProfile = await prisma.roastProfile.findFirst();
+  if (!roastProfile) throw new Error('Roast profile not found');
+
+  const greenBean = await prisma.greenBean.findFirst();
+  if (!greenBean) throw new Error('Green bean not found');
+
+  await prisma.batchPlan.createMany({
+    data: [
+      {
+        scheduledDate: new Date('2023-07-01'),
+        roastProfileId: roastProfile.id,
+        greenBeanId: greenBean.id,
+        batchSize: 5,
+      },
+      {
+        scheduledDate: new Date('2023-07-15'),
+        roastProfileId: roastProfile.id,
+        greenBeanId: greenBean.id,
+        batchSize: 7.5,
+      },
+    ],
+    skipDuplicates: true,
+  });
 }
 
 main()

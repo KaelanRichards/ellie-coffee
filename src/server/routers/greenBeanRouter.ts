@@ -73,17 +73,16 @@ export const greenBeanRouter = router({
     }),
   getLowStock: publicProcedure
     .input(z.object({ threshold: z.number() }))
-    .query(async ({ input }) => {
+    .query(({ input }) => {
       return prisma.greenBean.findMany({
         where: {
           quantity: {
             lte: input.threshold,
           },
         },
-        orderBy: { quantity: 'asc' },
+        select: defaultGreenBeanSelect,
       });
     }),
-
   getTotalCount: publicProcedure.query(async () => {
     return prisma.greenBean.count();
   }),
