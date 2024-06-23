@@ -4,11 +4,28 @@ import { useRouter } from 'next/router';
 import Link from 'next/link';
 import { FaCoffee, FaArrowLeft } from 'react-icons/fa';
 
+interface FormData {
+  name: string;
+  temperatureReadings: string;
+  firstCrack: string;
+  developmentTime: string;
+  totalRoastTime: string;
+  chargeTemperature: string;
+  endTemperature: string;
+  notes: string;
+}
+
 const NewRoastProfile = () => {
   const router = useRouter();
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormData>({
     name: '',
-    data: '',
+    temperatureReadings: '',
+    firstCrack: '',
+    developmentTime: '',
+    totalRoastTime: '',
+    chargeTemperature: '',
+    endTemperature: '',
+    notes: '',
   });
   const [error, setError] = useState('');
 
@@ -26,8 +43,14 @@ const NewRoastProfile = () => {
     setError('');
     try {
       createRoastProfile.mutate({
-        ...formData,
-        data: JSON.parse(formData.data),
+        name: formData.name,
+        temperatureReadings: JSON.parse(formData.temperatureReadings),
+        firstCrack: parseInt(formData.firstCrack) || undefined,
+        developmentTime: parseInt(formData.developmentTime) || undefined,
+        totalRoastTime: parseInt(formData.totalRoastTime) || undefined,
+        chargeTemperature: parseInt(formData.chargeTemperature) || undefined,
+        endTemperature: parseInt(formData.endTemperature) || undefined,
+        notes: formData.notes,
       });
     } catch (err) {
       setError('Invalid JSON data. Please check your input.');
@@ -54,44 +77,64 @@ const NewRoastProfile = () => {
         New Roast Profile
       </h1>
       <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="grid grid-cols-1 gap-6">
-          <div>
-            <label
-              htmlFor="name"
-              className="block text-sm font-medium text-brown-700 mb-1"
-            >
-              Profile Name
-            </label>
-            <input
-              type="text"
-              id="name"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              className="w-full p-2 border border-brown-300 rounded-md shadow-sm focus:ring-brown-500 focus:border-brown-500 text-brown-900"
-              required
-              aria-required="true"
-            />
-          </div>
-          <div>
-            <label
-              htmlFor="data"
-              className="block text-sm font-medium text-brown-700 mb-1"
-            >
-              Profile Data (JSON)
-            </label>
-            <textarea
-              id="data"
-              name="data"
-              value={formData.data}
-              onChange={handleChange}
-              className="w-full p-2 border border-brown-300 rounded-md shadow-sm focus:ring-brown-500 focus:border-brown-500 text-brown-900"
-              rows={6}
-              required
-              aria-required="true"
-            />
-          </div>
-        </div>
+        <FormField
+          label="Profile Name"
+          name="name"
+          type="text"
+          value={formData.name}
+          onChange={handleChange}
+          required
+        />
+        <FormField
+          label="Temperature Readings (JSON)"
+          name="temperatureReadings"
+          type="textarea"
+          value={formData.temperatureReadings}
+          onChange={handleChange}
+          required
+        />
+        <FormField
+          label="First Crack (seconds)"
+          name="firstCrack"
+          type="number"
+          value={formData.firstCrack}
+          onChange={handleChange}
+        />
+        <FormField
+          label="Development Time (seconds)"
+          name="developmentTime"
+          type="number"
+          value={formData.developmentTime}
+          onChange={handleChange}
+        />
+        <FormField
+          label="Total Roast Time (seconds)"
+          name="totalRoastTime"
+          type="number"
+          value={formData.totalRoastTime}
+          onChange={handleChange}
+        />
+        <FormField
+          label="Charge Temperature (degrees)"
+          name="chargeTemperature"
+          type="number"
+          value={formData.chargeTemperature}
+          onChange={handleChange}
+        />
+        <FormField
+          label="End Temperature (degrees)"
+          name="endTemperature"
+          type="number"
+          value={formData.endTemperature}
+          onChange={handleChange}
+        />
+        <FormField
+          label="Notes"
+          name="notes"
+          type="textarea"
+          value={formData.notes}
+          onChange={handleChange}
+        />
         {error && (
           <p className="text-red-600" role="alert">
             {error}
@@ -110,5 +153,55 @@ const NewRoastProfile = () => {
     </main>
   );
 };
+
+interface FormFieldProps {
+  label: string;
+  name: string;
+  type: string;
+  value: string;
+  onChange: (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => void;
+  required?: boolean;
+}
+
+const FormField: React.FC<FormFieldProps> = ({
+  label,
+  name,
+  type,
+  value,
+  onChange,
+  required,
+}) => (
+  <div>
+    <label
+      htmlFor={name}
+      className="block text-sm font-medium text-brown-700 mb-1"
+    >
+      {label}
+    </label>
+    {type === 'textarea' ? (
+      <textarea
+        id={name}
+        name={name}
+        value={value}
+        onChange={onChange}
+        className="w-full p-2 border border-brown-300 rounded-md shadow-sm focus:ring-brown-500 focus:border-brown-500 text-brown-900"
+        rows={6}
+        required={required}
+      />
+    ) : (
+      <input
+        type={type}
+        id={name}
+        name={name}
+        value={value}
+        onChange={onChange}
+        className="w-full p-2 border border-brown-300 rounded-md shadow-sm focus:ring-brown-500 focus:border-brown-500 text-brown-900"
+        required={required}
+      />
+    )}
+  </div>
+);
 
 export default NewRoastProfile;

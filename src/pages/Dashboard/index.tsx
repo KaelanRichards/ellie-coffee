@@ -1,7 +1,7 @@
 import { trpc } from '~/utils/trpc';
 import Link from 'next/link';
 import { CgCoffee, CgNotes, CgDatabase } from 'react-icons/cg';
-import { FaCalendarAlt, FaLeaf } from 'react-icons/fa';
+import { FaCalendarAlt, FaLeaf, FaExchangeAlt } from 'react-icons/fa';
 import { useState } from 'react';
 
 const DashboardPage = () => {
@@ -225,6 +225,12 @@ const QuickActionButtons = () => (
       label="Add Beans"
       color="green"
     />
+    <DashboardButton
+      href="/roast-comparison"
+      icon={<FaExchangeAlt className="w-5 h-5" />}
+      label="Compare Roasts"
+      color="purple"
+    />
   </nav>
 );
 
@@ -233,7 +239,7 @@ interface DashboardButtonProps {
   icon: React.ReactNode;
   label: string;
   primary?: boolean;
-  color?: 'brown' | 'green';
+  color?: 'brown' | 'green' | 'purple';
 }
 
 const DashboardButton: React.FC<DashboardButtonProps> = ({

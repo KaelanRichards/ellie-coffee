@@ -36,36 +36,40 @@ model RoastLog {
 }
 
 model RoastProfile {
-  id        String   @id @default(uuid())
-  name      String
-  data      Json
-  // Example json data structure:
-  // {
-  //   "temperatureCurve": [
-  //     {"time": 0, "temp": 200},
-  //     {"time": 60, "temp": 300},
-  //     {"time": 120, "temp": 380},
-  //     {"time": 180, "temp": 420}
-  //   ],
-  //   "firstCrack": 150,
-  //   "developmentTime": 60,
-  //   "endTemperature": 430,
-  //   "totalRoastTime": 240,
-  //   "airflowSettings": [
-  //     {"time": 0, "value": 50},
-  //     {"time": 120, "value": 75},
-  //     {"time": 180, "value": 100}
-  //   ]
-  // }
-  firstCrack     Int?
-  developmentTime Int?
-  endTemperature  Int?
-  totalRoastTime  Int?
-  userId    String
-  user      User     @relation(fields: [userId], references: [id])
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  roastLogs RoastLog[]
+  id              String   @id @default(uuid())
+  name            String
+  userId          String
+  user            User     @relation(fields: [userId], references: [id])
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  roastLogs       RoastLog[]
+  temperatureReadings TemperatureReading[]
+  notes              String?
+  
+  firstCrack       Int?    // Time in seconds
+  developmentTime  Int?    // Time in seconds
+  endTemperature   Int?    // Temperature in degrees
+  totalRoastTime   Int?    // Time in seconds
+  
+  // Additional roast parameters
+  chargeTemperature Int?   // Initial temperature in degrees
+  dryingPhaseEnd    Int?   // Time in seconds
+  firstCrackEnd     Int?   // Time in seconds
+  coolingStarted    Int?   // Time in seconds
+  
+  // Roaster settings
+  airflowSettings   Json?  // Array of {time: number, value: number}
+  drumSpeed         Int?   // RPM
+  heatSettings      Json?  // Array of {time: number, value: number}
+}
+
+model TemperatureReading {
+  id            String   @id @default(uuid())
+  roastProfileId String
+  roastProfile  RoastProfile @relation(fields: [roastProfileId], references: [id])
+  time          Int      // Time in seconds
+  temperature   Float    // Temperature in degrees
+  createdAt     DateTime @default(now())
 }
 
 model GreenBean {

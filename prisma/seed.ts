@@ -59,58 +59,70 @@ async function seedRoastProfiles() {
     data: [
       {
         name: 'Light Roast Profile',
-        data: {
-          temperatureCurve: [
-            { time: 0, temp: 200 },
-            { time: 60, temp: 300 },
-            { time: 120, temp: 350 },
-            { time: 180, temp: 380 },
-            { time: 240, temp: 400 },
-            { time: 300, temp: 410 },
-          ],
-          firstCrack: 240,
-          developmentTime: 60,
-        },
         userId: user.id,
+        firstCrack: 240,
+        developmentTime: 60,
+        endTemperature: 410,
+        totalRoastTime: 300,
+        chargeTemperature: 200,
+        dryingPhaseEnd: 180,
+        firstCrackEnd: 270,
+        coolingStarted: 300,
+        airflowSettings: JSON.stringify([
+          { time: 0, value: 50 },
+          { time: 180, value: 75 },
+          { time: 240, value: 100 },
+        ]),
+        drumSpeed: 50,
+        heatSettings: JSON.stringify([
+          { time: 0, value: 80 },
+          { time: 180, value: 70 },
+          { time: 240, value: 60 },
+        ]),
+        notes: 'Light roast with floral notes and bright acidity', // Added notes
       },
       {
         name: 'Medium Roast Profile',
-        data: {
-          temperatureCurve: [
-            { time: 0, temp: 200 },
-            { time: 60, temp: 300 },
-            { time: 120, temp: 360 },
-            { time: 180, temp: 390 },
-            { time: 240, temp: 410 },
-            { time: 300, temp: 425 },
-            { time: 360, temp: 435 },
-          ],
-          firstCrack: 270,
-          developmentTime: 90,
-        },
         userId: user.id,
-      },
-      {
-        name: 'Dark Roast Profile',
-        data: {
-          temperatureCurve: [
-            { time: 0, temp: 200 },
-            { time: 60, temp: 300 },
-            { time: 120, temp: 370 },
-            { time: 180, temp: 400 },
-            { time: 240, temp: 420 },
-            { time: 300, temp: 440 },
-            { time: 360, temp: 450 },
-            { time: 420, temp: 455 },
-          ],
-          firstCrack: 300,
-          developmentTime: 120,
-        },
-        userId: user.id,
+        firstCrack: 270,
+        developmentTime: 90,
+        endTemperature: 435,
+        totalRoastTime: 360,
+        chargeTemperature: 200,
+        dryingPhaseEnd: 210,
+        firstCrackEnd: 300,
+        coolingStarted: 360,
+        airflowSettings: JSON.stringify([
+          { time: 0, value: 50 },
+          { time: 210, value: 75 },
+          { time: 270, value: 100 },
+        ]),
+        drumSpeed: 55,
+        heatSettings: JSON.stringify([
+          { time: 0, value: 85 },
+          { time: 210, value: 75 },
+          { time: 270, value: 65 },
+        ]),
+        notes: 'Balanced medium roast with caramel sweetness', // Added notes
       },
     ],
     skipDuplicates: true,
   });
+
+  // Seed TemperatureReadings for each RoastProfile
+  const profiles = await prisma.roastProfile.findMany();
+  for (const profile of profiles) {
+    await prisma.temperatureReading.createMany({
+      data: [
+        { roastProfileId: profile.id, time: 0, temperature: 200 },
+        { roastProfileId: profile.id, time: 60, temperature: 300 },
+        { roastProfileId: profile.id, time: 120, temperature: 350 },
+        { roastProfileId: profile.id, time: 180, temperature: 380 },
+        { roastProfileId: profile.id, time: 240, temperature: 400 },
+        { roastProfileId: profile.id, time: 300, temperature: 410 },
+      ],
+    });
+  }
 }
 
 async function seedRoastLogs() {
@@ -131,7 +143,7 @@ async function seedRoastLogs() {
         equipment: 'Sample Roaster 1kg',
         notes: 'First crack at 9 minutes, development time 2 minutes',
         userId: user.id,
-        weight: 250, // Added weight field
+        weight: 250,
       },
       {
         date: new Date('2023-06-15'),
@@ -140,7 +152,7 @@ async function seedRoastLogs() {
         equipment: 'Sample Roaster 1kg',
         notes: 'Smooth roast, nice caramel notes',
         userId: user.id,
-        weight: 300, // Added weight field
+        weight: 300,
       },
     ],
     skipDuplicates: true,

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Line } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -9,7 +9,9 @@ import {
   Title,
   Tooltip,
   Legend,
+  ChartOptions,
 } from 'chart.js';
+import { TemperatureReading } from '@prisma/client';
 
 ChartJS.register(
   CategoryScale,
@@ -23,53 +25,34 @@ ChartJS.register(
 
 export interface RoastCurveChartProps {
   data: {
-    temperatureCurve: { time: number; temp: number }[];
-    firstCrack?: number;
-    developmentTime?: number;
-  };
-  comparisonData?: {
-    temperatureCurve: { time: number; temp: number }[];
+    temperatureReadings: { time: number; temperature: number }[];
     firstCrack?: number;
     developmentTime?: number;
   };
 }
 
-const RoastCurveChart: React.FC<RoastCurveChartProps> = ({
-  data,
-  comparisonData,
-}) => {
-  const [hoveredPoint, setHoveredPoint] = useState<{
-    time: number;
-    temp: number;
-  } | null>(null);
+const RoastCurveChart: React.FC<RoastCurveChartProps> = ({ data }) => {
+  const [hoveredPoint, setHoveredPoint] = useState<Pick<
+    TemperatureReading,
+    'time' | 'temperature'
+  > | null>(null);
 
-  if (!data.temperatureCurve || data.temperatureCurve.length === 0) {
-    return <div>No temperature data available</div>;
-  }
+  const chartData = useMemo(
+    () => ({
+      labels: data.temperatureReadings.map((reading) => reading.time),
+      datasets: [
+        {
+          label: 'Temperature',
+          data: data.temperatureReadings.map((reading) => reading.temperature),
+          borderColor: 'rgb(255, 99, 132)',
+          backgroundColor: 'rgba(255, 99, 132, 0.5)',
+        },
+      ],
+    }),
+    [data.temperatureReadings],
+  );
 
-  const chartData = {
-    labels: data.temperatureCurve.map((point) => point.time),
-    datasets: [
-      {
-        label: 'Temperature',
-        data: data.temperatureCurve.map((point) => point.temp),
-        borderColor: 'rgb(255, 99, 132)',
-        backgroundColor: 'rgba(255, 99, 132, 0.5)',
-      },
-      ...(comparisonData
-        ? [
-            {
-              label: 'Comparison Temperature',
-              data: comparisonData.temperatureCurve.map((point) => point.temp),
-              borderColor: 'rgb(54, 162, 235)',
-              backgroundColor: 'rgba(54, 162, 235, 0.5)',
-            },
-          ]
-        : []),
-    ],
-  };
-
-  const options = {
+  const options: ChartOptions<'line'> = {
     responsive: true,
     plugins: {
       legend: {
@@ -81,8 +64,8 @@ const RoastCurveChart: React.FC<RoastCurveChartProps> = ({
       },
       tooltip: {
         callbacks: {
-          label: (context: any) => {
-            const label = context.dataset.label || '';
+          label: (context) => {
+            const label = context.dataset.label ?? '';
             const value = context.parsed.y;
             return `${label}: ${value}°F`;
           },
@@ -103,20 +86,25 @@ const RoastCurveChart: React.FC<RoastCurveChartProps> = ({
         },
       },
     },
-    onHover: (event: any, elements: any[]) => {
+    onHover: (event, elements) => {
       if (elements && elements.length > 0) {
-        const dataIndex = elements[0].index;
-        const point = data.temperatureCurve[dataIndex];
-        if (point) {
-          setHoveredPoint(point);
-        } else {
-          setHoveredPoint(null);
-        }
+        const dataIndex = elements[0]?.index;
+        const point =
+          dataIndex !== undefined
+            ? data.temperatureReadings[dataIndex] ?? null
+            : null;
+        setHoveredPoint(
+          point ? { time: point.time, temperature: point.temperature } : null,
+        );
       } else {
         setHoveredPoint(null);
       }
     },
   };
+
+  if (!data.temperatureReadings || data.temperatureReadings.length === 0) {
+    return <div>No temperature data available</div>;
+  }
 
   return (
     <div>
@@ -124,7 +112,7 @@ const RoastCurveChart: React.FC<RoastCurveChartProps> = ({
       {hoveredPoint && (
         <div className="mt-2 text-sm">
           <p>Time: {hoveredPoint.time} seconds</p>
-          <p>Temperature: {hoveredPoint.temp}°F</p>
+          <p>Temperature: {hoveredPoint.temperature}°F</p>
           {data.firstCrack && hoveredPoint.time >= data.firstCrack && (
             <p>First Crack: {data.firstCrack} seconds</p>
           )}

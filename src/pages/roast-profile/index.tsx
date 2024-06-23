@@ -3,15 +3,30 @@ import Link from 'next/link';
 import { FaPlus, FaCoffee, FaEdit, FaTrash } from 'react-icons/fa';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import { useState } from 'react';
-import RoastCurveChart, {
-  RoastCurveChartProps,
-} from '~/components/RoastCurveChart';
+import RoastCurveChart from '~/components/RoastCurveChart';
+
+// Add this type definition
+type TemperatureReading = {
+  time: number;
+  temperature: number;
+};
+
+// Update the RoastCurveChartProps interface
+interface RoastCurveChartProps {
+  temperatureReadings: TemperatureReading[];
+  firstCrack?: number;
+  developmentTime?: number;
+}
 
 const RoastProfilesPage = () => {
-  const { data: profiles, isLoading } = trpc.roastProfile.getAll.useQuery();
+  const {
+    data: profiles,
+    isLoading,
+    refetch,
+  } = trpc.roastProfile.getAll.useQuery();
   const deleteProfile = trpc.roastProfile.delete.useMutation({
     onSuccess: () => {
-      // Refetch profiles after deletion
+      refetch();
     },
   });
 
@@ -100,11 +115,11 @@ const RoastProfilesPage = () => {
                   {expandedProfile === profile.id && (
                     <div className="mt-4 bg-gray-50 p-4 rounded-md">
                       <pre className="text-xs overflow-x-auto">
-                        {JSON.stringify(profile.data, null, 2)}
+                        {JSON.stringify(profile, null, 2)}
                       </pre>
                     </div>
                   )}
-                  {profile.data && (
+                  {profile.temperatureReadings && (
                     <section className="mt-8" aria-labelledby="roast-curve">
                       <h2
                         id="roast-curve"
@@ -113,7 +128,7 @@ const RoastProfilesPage = () => {
                         Roast Curve
                       </h2>
                       <div className="bg-white shadow-lg rounded-lg overflow-hidden p-4">
-                        <RoastCurveChart data={formatChartData(profile.data)} />
+                        <RoastCurveChart data={formatChartData(profile)} />
                       </div>
                     </section>
                   )}
@@ -140,22 +155,18 @@ const RoastProfilesPage = () => {
   );
 };
 
-const formatChartData = (data: any): RoastCurveChartProps['data'] => {
-  if (typeof data !== 'object' || !Array.isArray(data.temperatureCurve)) {
-    return { temperatureCurve: [] };
+const formatChartData = (profile: any): RoastCurveChartProps => {
+  if (!Array.isArray(profile.temperatureReadings)) {
+    return { temperatureReadings: [] };
   }
 
   return {
-    temperatureCurve: data.temperatureCurve.map((point: any) => ({
-      time: Number(point.time) || 0,
-      temp: Number(point.temp) || 0,
+    temperatureReadings: profile.temperatureReadings.map((reading: any) => ({
+      time: Number(reading.time) || 0,
+      temperature: Number(reading.temperature) || 0,
     })),
-    firstCrack:
-      typeof data.firstCrack === 'number' ? data.firstCrack : undefined,
-    developmentTime:
-      typeof data.developmentTime === 'number'
-        ? data.developmentTime
-        : undefined,
+    firstCrack: profile.firstCrack,
+    developmentTime: profile.developmentTime,
   };
 };
 
