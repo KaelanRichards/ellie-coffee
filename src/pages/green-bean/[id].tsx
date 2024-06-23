@@ -18,6 +18,21 @@ const GreenBeanPage = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [formError, setFormError] = useState('');
 
+  const deleteGreenBean = trpc.greenBean.delete.useMutation({
+    onSuccess: () => {
+      router.push('/green-bean');
+    },
+  });
+
+  const handleDelete = async () => {
+    if (
+      window.confirm('Are you sure you want to delete this green bean?') &&
+      bean
+    ) {
+      await deleteGreenBean.mutateAsync({ id: bean.id });
+    }
+  };
+
   if (isLoading)
     return (
       <div className="flex items-center justify-center h-screen" role="status">
@@ -167,6 +182,12 @@ const GreenBeanPage = () => {
             >
               <FaEdit className="mr-2" aria-hidden="true" />
               Edit
+            </button>
+            <button
+              onClick={handleDelete}
+              className="ml-4 bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 inline-flex items-center transition-colors"
+            >
+              Delete
             </button>
           </div>
         )}

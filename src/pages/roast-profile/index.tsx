@@ -1,78 +1,119 @@
 import { trpc } from '../../utils/trpc';
 import Link from 'next/link';
-import { FaPlus, FaCoffee } from 'react-icons/fa';
+import { FaPlus, FaCoffee, FaEdit, FaTrash } from 'react-icons/fa';
 import LoadingSpinner from '../../components/LoadingSpinner';
+import { useState } from 'react';
 
 const RoastProfilesPage = () => {
   const { data: profiles, isLoading } = trpc.roastProfile.getAll.useQuery();
+  const deleteProfile = trpc.roastProfile.delete.useMutation({
+    onSuccess: () => {
+      // Refetch profiles after deletion
+    },
+  });
+
+  const [expandedProfile, setExpandedProfile] = useState<string | null>(null);
+
+  const handleDelete = async (id: string) => {
+    if (window.confirm('Are you sure you want to delete this roast profile?')) {
+      await deleteProfile.mutateAsync({ id });
+    }
+  };
 
   if (isLoading) return <LoadingSpinner />;
 
   return (
-    <div className="bg-white min-h-screen">
-      <main className="max-w-4xl mx-auto px-4 py-8">
+    <div className="bg-gray-100 min-h-screen">
+      <main className="max-w-6xl mx-auto px-4 py-8">
         <header className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          <h1 className="text-4xl font-bold text-gray-900 mb-2 flex items-center">
+            <FaCoffee className="mr-4 text-brown-600" aria-hidden="true" />
             Roast Profiles
           </h1>
-          <p className="text-gray-600">Manage your coffee roasting profiles</p>
+          <p className="text-xl text-gray-600">
+            Manage your coffee roasting profiles
+          </p>
         </header>
 
         <Link
           href="/roast-profile/new"
-          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-brown-600 hover:bg-brown-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brown-500 mb-6"
+          className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-full shadow-sm text-white bg-brown-600 hover:bg-brown-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brown-500 transition-colors duration-200 mb-8"
         >
           <FaPlus className="mr-2" aria-hidden="true" />
           New Roast Profile
         </Link>
 
         {profiles && profiles.length > 0 ? (
-          <ul
-            className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3"
-            role="list"
-          >
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {profiles.map((profile) => (
-              <li
+              <div
                 key={profile.id}
-                className="col-span-1 bg-white rounded-lg shadow divide-y divide-gray-200"
+                className="bg-white shadow-xl rounded-lg overflow-hidden"
               >
-                <Link
-                  href={`/roast-profile/${profile.id}`}
-                  className="flex flex-col h-full"
-                >
-                  <div className="flex-1 flex flex-col p-8">
-                    <FaCoffee
-                      className="w-12 h-12 flex-shrink-0 text-brown-400 mb-4"
-                      aria-hidden="true"
-                    />
-                    <h2 className="mt-2 text-xl font-medium text-gray-900">
-                      {profile.name}
-                    </h2>
-                    <p className="mt-2 text-sm text-gray-500">
-                      Created on{' '}
-                      {new Date(profile.createdAt).toLocaleDateString()}
-                    </p>
-                  </div>
-                  <div className="border-t border-gray-200">
-                    <div className="flex justify-end p-4">
-                      <span className="inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-brown-100 text-brown-800">
-                        View Details
-                      </span>
+                <div className="p-6">
+                  <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                    {profile.name}
+                  </h2>
+                  <p className="text-sm text-gray-500 mb-4">
+                    Created on{' '}
+                    {new Date(profile.createdAt).toLocaleDateString()}
+                  </p>
+                  <div className="flex justify-between items-center mb-4">
+                    <Link
+                      href={`/roast-profile/${profile.id}`}
+                      className="text-brown-600 hover:text-brown-900 transition-colors duration-200"
+                    >
+                      View Details
+                    </Link>
+                    <div>
+                      <Link
+                        href={`/roast-profile/${profile.id}/edit`}
+                        className="text-blue-600 hover:text-blue-800 mr-4"
+                      >
+                        <FaEdit aria-hidden="true" />
+                        <span className="sr-only">Edit</span>
+                      </Link>
+                      <button
+                        onClick={() => handleDelete(profile.id)}
+                        className="text-red-600 hover:text-red-800"
+                      >
+                        <FaTrash aria-hidden="true" />
+                        <span className="sr-only">Delete</span>
+                      </button>
                     </div>
                   </div>
-                </Link>
-              </li>
+                  <button
+                    onClick={() =>
+                      setExpandedProfile(
+                        expandedProfile === profile.id ? null : profile.id,
+                      )
+                    }
+                    className="text-sm text-gray-600 hover:text-gray-900"
+                  >
+                    {expandedProfile === profile.id
+                      ? 'Hide Details'
+                      : 'Show Details'}
+                  </button>
+                  {expandedProfile === profile.id && (
+                    <div className="mt-4 bg-gray-50 p-4 rounded-md">
+                      <pre className="text-xs overflow-x-auto">
+                        {JSON.stringify(profile.data, null, 2)}
+                      </pre>
+                    </div>
+                  )}
+                </div>
+              </div>
             ))}
-          </ul>
+          </div>
         ) : (
-          <div className="text-center py-12 bg-gray-50 rounded-lg">
+          <div className="text-center py-12 bg-white rounded-lg shadow-md">
             <FaCoffee
               className="mx-auto h-12 w-12 text-gray-400"
               aria-hidden="true"
             />
-            <h3 className="mt-2 text-sm font-medium text-gray-900">
+            <h2 className="mt-2 text-lg font-medium text-gray-900">
               No roast profiles
-            </h3>
+            </h2>
             <p className="mt-1 text-sm text-gray-500">
               Get started by creating a new roast profile.
             </p>

@@ -2,7 +2,7 @@ import { useRouter } from 'next/router';
 import { trpc } from '../../utils/trpc';
 import Link from 'next/link';
 import { useState } from 'react';
-import { FaEdit, FaSave, FaArrowLeft } from 'react-icons/fa';
+import { FaEdit, FaSave, FaArrowLeft, FaTrash } from 'react-icons/fa';
 import LoadingSpinner from '../../components/LoadingSpinner';
 
 const RoastProfilePage = () => {
@@ -12,6 +12,11 @@ const RoastProfilePage = () => {
     id: id as string,
   });
   const updateProfile = trpc.roastProfile.update.useMutation();
+  const deleteProfile = trpc.roastProfile.delete.useMutation({
+    onSuccess: () => {
+      router.push('/roast-profile');
+    },
+  });
   const [isEditing, setIsEditing] = useState(false);
 
   if (isLoading) return <LoadingSpinner />;
@@ -26,6 +31,12 @@ const RoastProfilePage = () => {
       data: JSON.parse(formData.get('data') as string),
     });
     setIsEditing(false);
+  };
+
+  const handleDelete = async () => {
+    if (window.confirm('Are you sure you want to delete this roast profile?')) {
+      await deleteProfile.mutateAsync({ id: profile.id });
+    }
   };
 
   return (
@@ -127,6 +138,14 @@ const RoastProfilePage = () => {
                   Edit
                 </>
               )}
+            </button>
+            <button
+              onClick={handleDelete}
+              className="ml-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors"
+              aria-label="Delete roast profile"
+            >
+              <FaTrash className="mr-2" aria-hidden="true" />
+              Delete
             </button>
           </div>
         </section>

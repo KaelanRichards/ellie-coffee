@@ -130,4 +130,23 @@ export const roastLogRouter = router({
       }
       return roastLog;
     }),
+
+  getUpcoming: publicProcedure.query(async () => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return prisma.roastLog.findMany({
+      where: {
+        date: {
+          gte: today,
+        },
+      },
+      orderBy: { date: 'asc' },
+      take: 5,
+      select: defaultRoastLogSelect,
+    });
+  }),
+
+  getTotalCount: publicProcedure.query(async () => {
+    return prisma.roastLog.count();
+  }),
 });

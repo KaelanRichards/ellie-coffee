@@ -8,36 +8,47 @@ interface LayoutProps {
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   return (
-    <div className="min-h-screen bg-gray-100">
-      <nav className="bg-brown-800 text-white p-4">
-        <div className="container mx-auto flex justify-between items-center">
-          <Link href="/" className="text-2xl font-bold flex items-center">
-            <CgCoffee className="mr-2" />
-            Coffee Roast Logger
-          </Link>
-          <div className="space-x-4">
+    <div className="min-h-screen bg-gray-50 text-gray-900">
+      <header className="bg-brown-800 text-white shadow-md">
+        <nav
+          className="container mx-auto px-4 py-3"
+          aria-label="Main Navigation"
+        >
+          <div className="flex justify-between items-center">
             <Link
-              href="/roast-log"
-              className="hover:text-brown-200 flex items-center"
+              href="/"
+              className="text-2xl font-bold flex items-center transition-colors hover:text-brown-200"
+              aria-label="Coffee Roast Logger Home"
             >
-              <CgNotes className="mr-1" /> Roast Logs
+              <CgCoffee className="mr-2 text-3xl" aria-hidden="true" />
+              <span>Coffee Roast Logger</span>
             </Link>
-            <Link
-              href="/green-bean"
-              className="hover:text-brown-200 flex items-center"
-            >
-              <CgDatabase className="mr-1" /> Green Beans
-            </Link>
-            <Link
-              href="/roast-profile"
-              className="hover:text-brown-200 flex items-center"
-            >
-              <CgProfile className="mr-1" /> Roast Profiles
-            </Link>
+            <ul className="flex space-x-6">
+              {[
+                { href: '/roast-log', label: 'Roast Logs', icon: CgNotes },
+                { href: '/green-bean', label: 'Green Beans', icon: CgDatabase },
+                {
+                  href: '/roast-profile',
+                  label: 'Roast Profiles',
+                  icon: CgProfile,
+                },
+              ].map(({ href, label, icon: Icon }) => (
+                <li key={href}>
+                  <Link
+                    href={href}
+                    className="flex items-center py-2 px-3 rounded-md transition-colors hover:bg-brown-700 focus:outline-none focus:ring-2 focus:ring-brown-300"
+                    aria-label={label}
+                  >
+                    <Icon className="mr-2 text-xl" aria-hidden="true" />
+                    <span>{label}</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
           </div>
-        </div>
-      </nav>
-      <main className="container mx-auto p-4">{children}</main>
+        </nav>
+      </header>
+      <main className="container mx-auto px-4 py-8">{children}</main>
     </div>
   );
 };

@@ -21,6 +21,21 @@ const RoastLogPage = () => {
     roastLogId: id as string,
   });
 
+  const deleteRoastLog = trpc.roastLog.delete.useMutation({
+    onSuccess: () => {
+      router.push('/roast-log');
+    },
+  });
+
+  const handleDelete = async () => {
+    if (
+      roastLog &&
+      window.confirm('Are you sure you want to delete this roast log?')
+    ) {
+      await deleteRoastLog.mutateAsync({ id: roastLog.id });
+    }
+  };
+
   if (isLoading) return <LoadingSpinner />;
   if (error)
     return (
@@ -171,6 +186,13 @@ const RoastLogPage = () => {
                     <FaEdit className="mr-2" aria-hidden="true" /> Edit
                   </>
                 )}
+              </button>
+              <button
+                onClick={handleDelete}
+                className="ml-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors"
+                aria-label="Delete roast log"
+              >
+                Delete
               </button>
             </div>
           </article>
