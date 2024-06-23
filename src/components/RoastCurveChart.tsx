@@ -29,9 +29,17 @@ export interface RoastCurveChartProps {
     firstCrack?: number;
     developmentTime?: number;
   };
+  comparisonData?: {
+    temperatureReadings: { time: number; temperature: number }[];
+    firstCrack?: number;
+    developmentTime?: number;
+  };
 }
 
-const RoastCurveChart: React.FC<RoastCurveChartProps> = ({ data }) => {
+const RoastCurveChart: React.FC<RoastCurveChartProps> = ({
+  data,
+  comparisonData,
+}) => {
   const [hoveredPoint, setHoveredPoint] = useState<Pick<
     TemperatureReading,
     'time' | 'temperature'
@@ -47,9 +55,21 @@ const RoastCurveChart: React.FC<RoastCurveChartProps> = ({ data }) => {
           borderColor: 'rgb(255, 99, 132)',
           backgroundColor: 'rgba(255, 99, 132, 0.5)',
         },
+        ...(comparisonData
+          ? [
+              {
+                label: 'Comparison Temperature',
+                data: comparisonData.temperatureReadings.map(
+                  (reading) => reading.temperature,
+                ),
+                borderColor: 'rgb(54, 162, 235)',
+                backgroundColor: 'rgba(54, 162, 235, 0.5)',
+              },
+            ]
+          : []),
       ],
     }),
-    [data.temperatureReadings],
+    [data.temperatureReadings, comparisonData],
   );
 
   const options: ChartOptions<'line'> = {
@@ -60,7 +80,7 @@ const RoastCurveChart: React.FC<RoastCurveChartProps> = ({ data }) => {
       },
       title: {
         display: true,
-        text: 'Roast Curve',
+        text: comparisonData ? 'Roast Curve Comparison' : 'Roast Curve',
       },
       tooltip: {
         callbacks: {
