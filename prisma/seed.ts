@@ -60,14 +60,51 @@ async function seedRoastProfiles() {
       {
         name: 'Light Roast Profile',
         data: {
-          /* Add your roast profile data here */
+          temperatureCurve: [
+            { time: 0, temp: 200 },
+            { time: 60, temp: 300 },
+            { time: 120, temp: 350 },
+            { time: 180, temp: 380 },
+            { time: 240, temp: 400 },
+            { time: 300, temp: 410 },
+          ],
+          firstCrack: 240,
+          developmentTime: 60,
         },
         userId: user.id,
       },
       {
         name: 'Medium Roast Profile',
         data: {
-          /* Add your roast profile data here */
+          temperatureCurve: [
+            { time: 0, temp: 200 },
+            { time: 60, temp: 300 },
+            { time: 120, temp: 360 },
+            { time: 180, temp: 390 },
+            { time: 240, temp: 410 },
+            { time: 300, temp: 425 },
+            { time: 360, temp: 435 },
+          ],
+          firstCrack: 270,
+          developmentTime: 90,
+        },
+        userId: user.id,
+      },
+      {
+        name: 'Dark Roast Profile',
+        data: {
+          temperatureCurve: [
+            { time: 0, temp: 200 },
+            { time: 60, temp: 300 },
+            { time: 120, temp: 370 },
+            { time: 180, temp: 400 },
+            { time: 240, temp: 420 },
+            { time: 300, temp: 440 },
+            { time: 360, temp: 450 },
+            { time: 420, temp: 455 },
+          ],
+          firstCrack: 300,
+          developmentTime: 120,
         },
         userId: user.id,
       },

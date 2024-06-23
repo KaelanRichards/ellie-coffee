@@ -3,6 +3,9 @@ import Link from 'next/link';
 import { FaPlus, FaCoffee, FaEdit, FaTrash } from 'react-icons/fa';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import { useState } from 'react';
+import RoastCurveChart, {
+  RoastCurveChartProps,
+} from '~/components/RoastCurveChart';
 
 const RoastProfilesPage = () => {
   const { data: profiles, isLoading } = trpc.roastProfile.getAll.useQuery();
@@ -101,6 +104,19 @@ const RoastProfilesPage = () => {
                       </pre>
                     </div>
                   )}
+                  {profile.data && (
+                    <section className="mt-8" aria-labelledby="roast-curve">
+                      <h2
+                        id="roast-curve"
+                        className="text-2xl font-bold mb-4 text-brown-900"
+                      >
+                        Roast Curve
+                      </h2>
+                      <div className="bg-white shadow-lg rounded-lg overflow-hidden p-4">
+                        <RoastCurveChart data={formatChartData(profile.data)} />
+                      </div>
+                    </section>
+                  )}
                 </div>
               </div>
             ))}
@@ -122,6 +138,25 @@ const RoastProfilesPage = () => {
       </main>
     </div>
   );
+};
+
+const formatChartData = (data: any): RoastCurveChartProps['data'] => {
+  if (typeof data !== 'object' || !Array.isArray(data.temperatureCurve)) {
+    return { temperatureCurve: [] };
+  }
+
+  return {
+    temperatureCurve: data.temperatureCurve.map((point: any) => ({
+      time: Number(point.time) || 0,
+      temp: Number(point.temp) || 0,
+    })),
+    firstCrack:
+      typeof data.firstCrack === 'number' ? data.firstCrack : undefined,
+    developmentTime:
+      typeof data.developmentTime === 'number'
+        ? data.developmentTime
+        : undefined,
+  };
 };
 
 export default RoastProfilesPage;

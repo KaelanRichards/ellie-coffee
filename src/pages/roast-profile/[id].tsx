@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { FaEdit, FaSave, FaArrowLeft, FaTrash } from 'react-icons/fa';
 import LoadingSpinner from '../../components/LoadingSpinner';
+import RoastCurveChart from '~/components/RoastCurveChart';
 
 const RoastProfilePage = () => {
   const router = useRouter();
@@ -21,6 +22,25 @@ const RoastProfilePage = () => {
 
   if (isLoading) return <LoadingSpinner />;
   if (!profile) return <div role="alert">Profile not found</div>;
+
+  const formatChartData = (data: any) => {
+    if (typeof data !== 'object' || !Array.isArray(data.temperatureCurve)) {
+      return { temperatureCurve: [] };
+    }
+
+    return {
+      temperatureCurve: data.temperatureCurve.map((point: any) => ({
+        time: Number(point.time) || 0,
+        temp: Number(point.temp) || 0,
+      })),
+      firstCrack:
+        typeof data.firstCrack === 'number' ? data.firstCrack : undefined,
+      developmentTime:
+        typeof data.developmentTime === 'number'
+          ? data.developmentTime
+          : undefined,
+    };
+  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -149,7 +169,17 @@ const RoastProfilePage = () => {
             </button>
           </div>
         </section>
-        {/* Add a visual representation of the roast curve here */}
+        <section className="mt-8" aria-labelledby="roast-curve">
+          <h2
+            id="roast-curve"
+            className="text-2xl font-bold mb-4 text-brown-900"
+          >
+            Roast Curve
+          </h2>
+          <div className="bg-white shadow-lg rounded-lg overflow-hidden p-4">
+            <RoastCurveChart data={formatChartData(profile.data)} />
+          </div>
+        </section>
       </main>
     </div>
   );
