@@ -19,7 +19,7 @@ const NewCuppingNote = () => {
 
   const createCuppingNote = trpc.cuppingNote.create.useMutation({
     onSuccess: () => {
-      router.push('/cupping-notes');
+      router.push('/cupping-note');
     },
   });
 
@@ -37,18 +37,25 @@ const NewCuppingNote = () => {
   };
 
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">New Cupping Note</h1>
+    <div className="container mx-auto p-4 bg-blue-50">
+      <h1 className="text-2xl font-bold mb-4 text-blue-900">
+        New Cupping Note
+      </h1>
       <form onSubmit={handleSubmit} className="space-y-4">
-        <input
-          type="text"
-          name="roastLogId"
-          value={formData.roastLogId}
-          onChange={handleChange}
-          placeholder="Roast Log ID"
-          className="w-full p-2 border rounded"
-          required
-        />
+        <div>
+          <label htmlFor="roastLogId" className="block text-blue-800 mb-1">
+            Roast Log ID
+          </label>
+          <input
+            id="roastLogId"
+            type="text"
+            name="roastLogId"
+            value={formData.roastLogId}
+            onChange={handleChange}
+            className="w-full p-2 border rounded text-blue-900 bg-white"
+            required
+          />
+        </div>
         {[
           'aroma',
           'flavor',
@@ -59,10 +66,11 @@ const NewCuppingNote = () => {
           'overall',
         ].map((attribute) => (
           <div key={attribute}>
-            <label className="block">
+            <label htmlFor={attribute} className="block text-blue-800 mb-1">
               {attribute.charAt(0).toUpperCase() + attribute.slice(1)}
             </label>
             <input
+              id={attribute}
               type="number"
               name={attribute}
               value={formData[attribute as keyof typeof formData]}
@@ -70,23 +78,35 @@ const NewCuppingNote = () => {
               min="0"
               max="10"
               step="0.1"
-              className="w-full p-2 border rounded"
+              className="w-full p-2 border rounded text-blue-900 bg-white"
               required
             />
           </div>
         ))}
-        <textarea
-          name="notes"
-          value={formData.notes}
-          onChange={handleChange}
-          placeholder="Notes"
-          className="w-full p-2 border rounded"
-        />
-        <button type="submit" className="bg-blue-500 text-white p-2 rounded">
+        <div>
+          <label htmlFor="notes" className="block text-blue-800 mb-1">
+            Notes
+          </label>
+          <textarea
+            id="notes"
+            name="notes"
+            value={formData.notes}
+            onChange={handleChange}
+            className="w-full p-2 border rounded text-blue-900 bg-white"
+            rows={4}
+          />
+        </div>
+        <button
+          type="submit"
+          className="bg-blue-600 text-white p-2 rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+        >
           Create Cupping Note
         </button>
       </form>
-      <Link href="/cupping-notes" className="mt-4 text-blue-500">
+      <Link
+        href="/cupping-note"
+        className="mt-4 inline-block text-blue-600 hover:text-blue-800 focus:outline-none focus:underline"
+      >
         Back to Cupping Notes
       </Link>
     </div>

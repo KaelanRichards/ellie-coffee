@@ -2,9 +2,9 @@ import type { NextPage } from 'next';
 import type { AppType, AppProps } from 'next/app';
 import type { ReactElement, ReactNode } from 'react';
 
-import { DefaultLayout } from '~/components/DefaultLayout';
 import { trpc } from '~/utils/trpc';
 import '~/styles/globals.css';
+import Layout from '~/components/Layout';
 
 export type NextPageWithLayout<
   TProps = Record<string, unknown>,
@@ -18,8 +18,7 @@ type AppPropsWithLayout = AppProps & {
 };
 
 const MyApp = (({ Component, pageProps }: AppPropsWithLayout) => {
-  const getLayout =
-    Component.getLayout ?? ((page) => <DefaultLayout>{page}</DefaultLayout>);
+  const getLayout = Component.getLayout ?? ((page) => <Layout>{page}</Layout>);
 
   return getLayout(<Component {...pageProps} />);
 }) as AppType;

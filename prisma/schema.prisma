@@ -32,6 +32,7 @@ model RoastLog {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
   cuppingNotes CuppingNote[]
+  weight       Float? 
 }
 
 model RoastProfile {

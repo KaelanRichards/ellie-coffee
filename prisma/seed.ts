@@ -94,6 +94,7 @@ async function seedRoastLogs() {
         equipment: 'Sample Roaster 1kg',
         notes: 'First crack at 9 minutes, development time 2 minutes',
         userId: user.id,
+        weight: 250, // Added weight field
       },
       {
         date: new Date('2023-06-15'),
@@ -102,6 +103,7 @@ async function seedRoastLogs() {
         equipment: 'Sample Roaster 1kg',
         notes: 'Smooth roast, nice caramel notes',
         userId: user.id,
+        weight: 300, // Added weight field
       },
     ],
     skipDuplicates: true,

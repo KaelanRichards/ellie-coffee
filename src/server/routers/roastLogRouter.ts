@@ -14,6 +14,7 @@ const defaultRoastLogSelect = {
   userId: true,
   createdAt: true,
   updatedAt: true,
+  weight: true,
   user: {
     select: {
       id: true,
@@ -24,6 +25,19 @@ const defaultRoastLogSelect = {
     select: {
       id: true,
       name: true,
+    },
+  },
+  cuppingNotes: {
+    select: {
+      id: true,
+      aroma: true,
+      flavor: true,
+      aftertaste: true,
+      acidity: true,
+      body: true,
+      balance: true,
+      overall: true,
+      notes: true,
     },
   },
 } satisfies Prisma.RoastLogSelect;
@@ -49,6 +63,7 @@ export const roastLogRouter = router({
         profileId: z.string(),
         equipment: z.string(),
         notes: z.string().optional(),
+        weight: z.number().optional(), // Added weight field
       }),
     )
     .mutation(({ input, ctx }) => {
@@ -72,6 +87,7 @@ export const roastLogRouter = router({
         profileId: z.string(),
         equipment: z.string(),
         notes: z.string().optional(),
+        weight: z.number().optional(), // Added weight field
       }),
     )
     .mutation(async ({ input }) => {
@@ -83,6 +99,7 @@ export const roastLogRouter = router({
           profileId: input.profileId,
           equipment: input.equipment,
           notes: input.notes,
+          weight: input.weight, // Added weight field
         },
         select: defaultRoastLogSelect,
       });

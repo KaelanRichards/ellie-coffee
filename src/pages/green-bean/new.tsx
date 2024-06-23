@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { trpc } from '~/utils/trpc';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
+import { FaLeaf, FaArrowLeft } from 'react-icons/fa';
 
 const NewGreenBean = () => {
   const router = useRouter();
@@ -33,60 +34,73 @@ const NewGreenBean = () => {
   };
 
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Add New Green Bean</h1>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <input
-          type="text"
-          name="origin"
-          value={formData.origin}
-          onChange={handleChange}
-          placeholder="Origin"
-          className="w-full p-2 border rounded"
-          required
-        />
-        <input
-          type="text"
-          name="variety"
-          value={formData.variety}
-          onChange={handleChange}
-          placeholder="Variety"
-          className="w-full p-2 border rounded"
-          required
-        />
-        <input
-          type="text"
-          name="processingMethod"
-          value={formData.processingMethod}
-          onChange={handleChange}
-          placeholder="Processing Method"
-          className="w-full p-2 border rounded"
-          required
-        />
-        <input
-          type="number"
-          name="quantity"
-          value={formData.quantity}
-          onChange={handleChange}
-          placeholder="Quantity"
-          className="w-full p-2 border rounded"
-          required
-        />
-        <input
-          type="date"
-          name="purchaseDate"
-          value={formData.purchaseDate}
-          onChange={handleChange}
-          className="w-full p-2 border rounded"
-          required
-        />
-        <button type="submit" className="bg-yellow-500 text-white p-2 rounded">
-          Add Green Bean
-        </button>
-      </form>
-      <Link href="/green-bean" className="mt-4 text-blue-500">
-        Back to Green Beans
-      </Link>
+    <div className="min-h-screen bg-green-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md mx-auto">
+        <Link
+          href="/green-bean"
+          className="flex items-center text-green-600 hover:text-green-800 mb-8 transition-colors duration-200"
+        >
+          <FaArrowLeft className="mr-2" aria-hidden="true" />
+          <span>Back to Green Beans</span>
+        </Link>
+        <div className="bg-white shadow-xl rounded-lg p-8">
+          <div className="flex items-center justify-center mb-8">
+            <FaLeaf
+              className="text-4xl text-green-600 mr-4"
+              aria-hidden="true"
+            />
+            <h1 className="text-3xl font-bold text-gray-900">
+              Add New Green Bean
+            </h1>
+          </div>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {[
+              { name: 'origin', label: 'Origin', type: 'text' },
+              { name: 'variety', label: 'Variety', type: 'text' },
+              {
+                name: 'processingMethod',
+                label: 'Processing Method',
+                type: 'text',
+              },
+              {
+                name: 'quantity',
+                label: 'Quantity (kg)',
+                type: 'number',
+                step: '0.1',
+                min: '0',
+              },
+              { name: 'purchaseDate', label: 'Purchase Date', type: 'date' },
+            ].map((field) => (
+              <div key={field.name}>
+                <label
+                  htmlFor={field.name}
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  {field.label}
+                </label>
+                <input
+                  type={field.type}
+                  id={field.name}
+                  name={field.name}
+                  value={formData[field.name as keyof typeof formData]}
+                  onChange={handleChange}
+                  className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 transition-colors duration-200"
+                  required
+                  aria-required="true"
+                  {...(field.step && { step: field.step })}
+                  {...(field.min && { min: field.min })}
+                />
+              </div>
+            ))}
+            <button
+              type="submit"
+              className="w-full bg-green-600 text-white p-4 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition duration-200 ease-in-out text-lg font-semibold"
+            >
+              Add Green Bean
+            </button>
+          </form>
+        </div>
+      </div>
     </div>
   );
 };
