@@ -2,12 +2,30 @@ import React, { useState } from 'react';
 import { trpc } from '~/utils/trpc';
 import RoastCurveChart from './RoastCurveChart';
 
+type RoastProfile = {
+  notes: string | null;
+  id: string;
+  userId: string;
+  createdAt: Date;
+  updatedAt: Date;
+  name: string;
+  firstCrack: number | null;
+  developmentTime: number | null;
+  endTemperature: number | null;
+  temperatureReadings: { temperature: number; time: number }[];
+  equipment?: { name: string } | null;
+  experiment?: { name: string } | null;
+  totalRoastTime: number | null;
+};
+
 const RoastComparisonTool: React.FC = () => {
   const [selectedProfileIds, setSelectedProfileIds] = useState<string[]>([
     '',
     '',
   ]);
-  const { data: roastProfiles } = trpc.roastProfile.getAll.useQuery();
+  const { data: roastProfiles } = trpc.roastProfile.getAll.useQuery() as {
+    data: RoastProfile[] | undefined;
+  };
 
   const handleProfileSelection = (index: number, profileId: string) => {
     const newSelectedProfileIds = [...selectedProfileIds];
@@ -93,6 +111,28 @@ const RoastComparisonTool: React.FC = () => {
           />
         </div>
       )}
+      <div className="mt-4">
+        <h3 className="text-lg font-semibold">Equipment Used:</h3>
+        <ul>
+          {selectedProfiles.map((roast) => (
+            <li key={roast?.id ?? 'default-key'}>
+              {roast?.createdAt.toLocaleDateString() ?? 'N/A'}:{' '}
+              {roast?.equipment?.name ?? 'N/A'}
+            </li>
+          ))}
+        </ul>
+      </div>
+      <div className="mt-4">
+        <h3 className="text-lg font-semibold">Experiments:</h3>
+        <ul>
+          {selectedProfiles.map((roast) => (
+            <li key={roast?.id ?? 'default-key'}>
+              {roast?.createdAt.toLocaleDateString() ?? 'N/A'}:{' '}
+              {roast?.experiment?.name ?? 'N/A'}
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 };

@@ -6,9 +6,11 @@ const prisma = new PrismaClient();
 async function main() {
   await seedUsers();
   await seedGreenBeans();
+  await seedEquipment();
   await seedRoastProfiles();
   await seedRoastLogs();
   await seedCuppingNotes();
+  await seedExperiments();
 
   console.log('Seed data created successfully');
 }
@@ -49,6 +51,36 @@ async function seedGreenBeans() {
   });
 }
 
+async function seedEquipment() {
+  await prisma.equipment.createMany({
+    data: [
+      {
+        name: 'Sample Roaster 1kg',
+        type: 'Roaster',
+        manufacturer: 'Coffee Tech',
+        model: 'FZ-94',
+        serialNumber: 'CT12345',
+        purchaseDate: new Date('2022-01-01'),
+        lastMaintenance: new Date('2023-01-01'),
+        nextMaintenance: new Date('2023-07-01'),
+        notes: 'Regular maintenance required every 6 months',
+      },
+      {
+        name: 'Grinder Pro',
+        type: 'Grinder',
+        manufacturer: 'Mahlkonig',
+        model: 'EK43',
+        serialNumber: 'MK67890',
+        purchaseDate: new Date('2022-03-15'),
+        lastMaintenance: new Date('2023-03-15'),
+        nextMaintenance: new Date('2023-09-15'),
+        notes: 'Burrs replacement due in 6 months',
+      },
+    ],
+    skipDuplicates: true,
+  });
+}
+
 async function seedRoastProfiles() {
   const user = await prisma.user.findUnique({
     where: { email: 'user@example.com' },
@@ -79,7 +111,7 @@ async function seedRoastProfiles() {
           { time: 180, value: 70 },
           { time: 240, value: 60 },
         ]),
-        notes: 'Light roast with floral notes and bright acidity', // Added notes
+        notes: 'Light roast with floral notes and bright acidity',
       },
       {
         name: 'Medium Roast Profile',
@@ -103,7 +135,7 @@ async function seedRoastProfiles() {
           { time: 210, value: 75 },
           { time: 270, value: 65 },
         ]),
-        notes: 'Balanced medium roast with caramel sweetness', // Added notes
+        notes: 'Balanced medium roast with caramel sweetness',
       },
     ],
     skipDuplicates: true,
@@ -134,13 +166,17 @@ async function seedRoastLogs() {
   const profile = await prisma.roastProfile.findFirst();
   if (!profile) throw new Error('Roast profile not found');
 
+  const equipment = await prisma.equipment.findFirst();
+  if (!equipment) throw new Error('Equipment not found');
+
   await prisma.roastLog.createMany({
     data: [
       {
         date: new Date('2023-06-01'),
         beanType: 'Ethiopia Yirgacheffe',
         profileId: profile.id,
-        equipment: 'Sample Roaster 1kg',
+        equipmentId: equipment.id,
+        equipment: equipment.name, // Added this line
         notes: 'First crack at 9 minutes, development time 2 minutes',
         userId: user.id,
         weight: 250,
@@ -149,7 +185,8 @@ async function seedRoastLogs() {
         date: new Date('2023-06-15'),
         beanType: 'Colombia Huila',
         profileId: profile.id,
-        equipment: 'Sample Roaster 1kg',
+        equipmentId: equipment.id,
+        equipment: equipment.name, // Added this line
         notes: 'Smooth roast, nice caramel notes',
         userId: user.id,
         weight: 300,
@@ -175,6 +212,53 @@ async function seedCuppingNotes() {
         overall: Math.floor(Math.random() * 3) + 7,
         notes: 'Bright acidity, floral notes with a hint of citrus',
       },
+    });
+  }
+}
+
+async function seedExperiments() {
+  const user = await prisma.user.findUnique({
+    where: { email: 'user@example.com' },
+  });
+  if (!user) throw new Error('User not found');
+
+  await prisma.experiment.createMany({
+    data: [
+      {
+        name: 'Varying Roast Profiles',
+        description: 'Testing different roast profiles on the same bean',
+        startDate: new Date('2023-07-01'),
+        endDate: new Date('2023-08-01'),
+        status: 'In Progress',
+        notes: 'Comparing light, medium, and dark roasts',
+      },
+      {
+        name: 'Processing Methods Comparison',
+        description: 'Comparing washed vs natural processed beans',
+        startDate: new Date('2023-08-15'),
+        endDate: null,
+        status: 'Planned',
+        notes: 'Using beans from the same farm with different processing',
+      },
+    ],
+    skipDuplicates: true,
+  });
+
+  // Link some roast logs to experiments
+  const experiments = await prisma.experiment.findMany();
+  const roastLogs = await prisma.roastLog.findMany({ take: 2 });
+
+  if (experiments[0] && roastLogs[0]) {
+    await prisma.roastLog.update({
+      where: { id: roastLogs[0].id },
+      data: { experimentId: experiments[0].id },
+    });
+  }
+
+  if (experiments[0] && roastLogs.length > 1 && roastLogs[1]) {
+    await prisma.roastLog.update({
+      where: { id: roastLogs[1].id },
+      data: { experimentId: experiments[0].id },
     });
   }
 }

@@ -1,7 +1,13 @@
 import { trpc } from '~/utils/trpc';
 import Link from 'next/link';
 import { CgCoffee, CgNotes, CgDatabase } from 'react-icons/cg';
-import { FaCalendarAlt, FaLeaf, FaExchangeAlt } from 'react-icons/fa';
+import {
+  FaCalendarAlt,
+  FaLeaf,
+  FaExchangeAlt,
+  FaTools,
+  FaFlask,
+} from 'react-icons/fa';
 import { useState } from 'react';
 
 const DashboardPage = () => {
@@ -63,7 +69,7 @@ const DashboardPage = () => {
           />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <RecentRoastsSection
             recentRoasts={recentRoasts?.map((roast) => ({
               id: roast.id,
@@ -73,20 +79,22 @@ const DashboardPage = () => {
               weight: roast.weight ?? 0,
             }))}
           />
-          <LowStockSection
-            lowStockBeans={
-              lowStockBeans?.map((bean) => ({
-                id: bean.id,
-                origin: bean.origin,
-                variety: bean.variety,
-                quantity: bean.quantity,
-              })) ?? []
-            }
-            showAllLowStock={showAllLowStock}
-            setShowAllLowStock={setShowAllLowStock}
-          />
+          <EquipmentSection />
+          <ExperimentSection />
         </div>
 
+        <LowStockSection
+          lowStockBeans={
+            lowStockBeans?.map((bean) => ({
+              id: bean.id,
+              origin: bean.origin,
+              variety: bean.variety,
+              quantity: bean.quantity,
+            })) ?? []
+          }
+          showAllLowStock={showAllLowStock}
+          setShowAllLowStock={setShowAllLowStock}
+        />
         <QuickActionButtons />
       </div>
     </div>
@@ -264,5 +272,71 @@ const DashboardButton: React.FC<DashboardButtonProps> = ({
     <span className="ml-2">{label}</span>
   </Link>
 );
+
+const EquipmentSection: React.FC = () => {
+  const { data: equipment } = trpc.equipment.getAll.useQuery();
+  return (
+    <section className="bg-white rounded-lg shadow-sm p-4">
+      <h2 className="text-lg font-light mb-2 text-gray-800 flex items-center">
+        <FaTools className="mr-2 text-gray-600" aria-hidden="true" /> Equipment
+      </h2>
+      <ul className="space-y-2">
+        {equipment?.slice(0, 3).map((eq) => (
+          <li key={eq.id}>
+            <Link
+              href={`/equipment/${eq.id}`}
+              className="block bg-gray-100 p-2 rounded-lg hover:bg-gray-200 transition-colors"
+            >
+              <div className="font-medium text-gray-800">{eq.name}</div>
+              <div className="text-sm text-gray-500">
+                {eq.type} | {eq.manufacturer}
+              </div>
+            </Link>
+          </li>
+        ))}
+      </ul>
+      <Link
+        href="/equipment"
+        className="text-sm text-brown-600 hover:text-brown-800"
+      >
+        View all →
+      </Link>
+    </section>
+  );
+};
+
+const ExperimentSection: React.FC = () => {
+  const { data: experiments } = trpc.experiment.getAll.useQuery();
+  return (
+    <section className="bg-white rounded-lg shadow-sm p-4">
+      <h2 className="text-lg font-light mb-2 text-gray-800 flex items-center">
+        <FaFlask className="mr-2 text-gray-600" aria-hidden="true" />{' '}
+        Experiments
+      </h2>
+      <ul className="space-y-2">
+        {experiments?.slice(0, 3).map((exp) => (
+          <li key={exp.id}>
+            <Link
+              href={`/experiment/${exp.id}`}
+              className="block bg-gray-100 p-2 rounded-lg hover:bg-gray-200 transition-colors"
+            >
+              <div className="font-medium text-gray-800">{exp.name}</div>
+              <div className="text-sm text-gray-500">
+                Status: {exp.status} | Started:{' '}
+                {exp.startDate.toLocaleDateString()}
+              </div>
+            </Link>
+          </li>
+        ))}
+      </ul>
+      <Link
+        href="/experiment"
+        className="text-sm text-brown-600 hover:text-brown-800"
+      >
+        View all →
+      </Link>
+    </section>
+  );
+};
 
 export default DashboardPage;

@@ -15,6 +15,8 @@ const defaultRoastLogSelect = {
   createdAt: true,
   updatedAt: true,
   weight: true,
+  equipmentId: true,
+  experimentId: true,
   user: {
     select: {
       id: true,
@@ -22,6 +24,18 @@ const defaultRoastLogSelect = {
     },
   },
   profile: {
+    select: {
+      id: true,
+      name: true,
+    },
+  },
+  equipmentDetails: {
+    select: {
+      id: true,
+      name: true,
+    },
+  },
+  experiment: {
     select: {
       id: true,
       name: true,
@@ -63,7 +77,9 @@ export const roastLogRouter = router({
         profileId: z.string(),
         equipment: z.string(),
         notes: z.string().optional(),
-        weight: z.number().optional(), // Added weight field
+        weight: z.number().optional(),
+        equipmentId: z.string().optional(),
+        experimentId: z.string().optional(),
       }),
     )
     .mutation(({ input, ctx }) => {
@@ -87,7 +103,9 @@ export const roastLogRouter = router({
         profileId: z.string(),
         equipment: z.string(),
         notes: z.string().optional(),
-        weight: z.number().optional(), // Added weight field
+        weight: z.number().optional(),
+        equipmentId: z.string().optional(),
+        experimentId: z.string().optional(),
       }),
     )
     .mutation(async ({ input }) => {
@@ -99,7 +117,9 @@ export const roastLogRouter = router({
           profileId: input.profileId,
           equipment: input.equipment,
           notes: input.notes,
-          weight: input.weight, // Added weight field
+          weight: input.weight,
+          equipmentId: input.equipmentId,
+          experimentId: input.experimentId,
         },
         select: defaultRoastLogSelect,
       });

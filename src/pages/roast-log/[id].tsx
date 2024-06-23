@@ -5,6 +5,30 @@ import { useState } from 'react';
 import { FaEdit, FaSave, FaArrowLeft, FaCoffee } from 'react-icons/fa';
 import LoadingSpinner from '../../components/LoadingSpinner';
 
+// Add this type definition at the top of the file
+type RoastLog = {
+  date: Date;
+  beanType: string;
+  profileId: string;
+  equipment: string;
+  notes: string | null;
+  weight: number | null;
+  id: string;
+  userId: string;
+  createdAt: Date;
+  updatedAt: Date;
+  profile: {
+    name: string;
+  };
+  user: {
+    // ... user properties
+  };
+  cuppingNotes: {
+    // ... cupping note properties
+  }[];
+  experiment?: { name: string } | null;
+};
+
 const RoastLogPage = () => {
   const router = useRouter();
   const { id } = router.query;
@@ -14,7 +38,7 @@ const RoastLogPage = () => {
     error,
   } = trpc.roastLog.getById.useQuery({
     id: id as string,
-  });
+  }) as { data: RoastLog | undefined; isLoading: boolean; error: any };
   const updateRoastLog = trpc.roastLog.update.useMutation();
   const [isEditing, setIsEditing] = useState(false);
   const { data: cuppingNotes } = trpc.cuppingNote.getByRoastLogId.useQuery({
@@ -158,10 +182,16 @@ const RoastLogPage = () => {
                     label="Profile"
                     value={roastLog.profile.name}
                   />
-                  <RoastLogDetail
-                    label="Equipment"
-                    value={roastLog.equipment}
-                  />
+                  {roastLog.equipment && (
+                    <div>
+                      <dt className="text-sm font-medium text-gray-500">
+                        Equipment
+                      </dt>
+                      <dd className="mt-1 text-sm text-gray-900">
+                        {roastLog.equipment}
+                      </dd>
+                    </div>
+                  )}
                   <RoastLogDetail
                     label="Weight"
                     value={roastLog.weight ? `${roastLog.weight}g` : 'N/A'}
@@ -170,6 +200,16 @@ const RoastLogPage = () => {
                     label="Notes"
                     value={roastLog.notes ?? 'No notes'}
                   />
+                  {roastLog.experiment && (
+                    <div>
+                      <dt className="text-sm font-medium text-gray-500">
+                        Experiment
+                      </dt>
+                      <dd className="mt-1 text-sm text-gray-900">
+                        {roastLog.experiment.name}
+                      </dd>
+                    </div>
+                  )}
                 </div>
               )}
             </div>

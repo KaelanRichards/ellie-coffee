@@ -33,6 +33,10 @@ model RoastLog {
   updatedAt    DateTime @updatedAt
   cuppingNotes CuppingNote[]
   weight       Float? 
+  equipmentId  String?
+  equipmentDetails Equipment? @relation(fields: [equipmentId], references: [id])
+  experimentId String?
+  experiment   Experiment? @relation(fields: [experimentId], references: [id])
 }
 
 model RoastProfile {
@@ -97,4 +101,33 @@ model CuppingNote {
   notes      String?
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
+}
+
+model Equipment {
+  id           String   @id @default(uuid())
+  name         String
+  type         String
+  manufacturer String
+  model        String
+  serialNumber String?
+  purchaseDate DateTime
+  lastMaintenance DateTime?
+  nextMaintenance DateTime?
+  notes        String?
+  roastLogs    RoastLog[]
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Experiment {
+  id           String   @id @default(uuid())
+  name         String
+  description  String
+  startDate    DateTime
+  endDate      DateTime?
+  status       String
+  roastLogs    RoastLog[]
+  notes        String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 }
